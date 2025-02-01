@@ -1,0 +1,44 @@
+const express = require("express");
+const Book = require("../models/Book");
+
+const router = express.Router();
+
+// Show All Books
+router.get("/", async (req, res) => {
+    const books = await Book.find();
+    res.render("index", { books });
+});
+
+// Add Book Page
+router.get("/add", (req, res) => {
+    res.render("addBook");
+});
+
+// Handle Add Book
+router.post("/add", async (req, res) => {
+    const { title, author, genre, publishedYear } = req.body;
+    const newBook = new Book({ title, author, genre, publishedYear });
+    await newBook.save();
+    res.redirect("/");
+});
+
+// Edit Book Page
+router.get("/edit/:id", async (req, res) => {
+    const book = await Book.findById(req.params.id);
+    res.render("editBook", { book });
+});
+
+// Handle Edit Book
+router.post("/edit/:id", async (req, res) => {
+    const { title, author, genre, publishedYear } = req.body;
+    await Book.findByIdAndUpdate(req.params.id, { title, author, genre, publishedYear });
+    res.redirect("/");
+});
+
+// Delete Book
+router.get("/delete/:id", async (req, res) => {
+    await Book.findByIdAndDelete(req.params.id);
+    res.redirect("/");
+});
+
+module.exports = router;
